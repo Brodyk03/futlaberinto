@@ -22,17 +22,17 @@ public class MainScene : MonoBehaviour
         Vector3 [,] posiciones = new Vector3[26,22];
         for (int i = 0; i < posiciones.GetLength(0); i++)
         {
-            for (int j = 0; j <posiciones.GetLength(1); j++) posiciones[i,j] = posinit - new Vector3((float)i,0f,(float)j);
+            for (int j = 0; j <posiciones.GetLength(1); j++) posiciones[i,j] = posinit - new Vector3((float)i,0f,(float)-j);
         }
         Tablero tablero = new Tablero(posiciones);
         tablero.Generate_Board();
-        for (int i = 0; i < 26; i++)
-        {
-            for (int j = 0; j < 22; j++)
-            {
-                Instantiate(tablero[i,j].casilla);
-            }
-        }
+        // for (int i = 0; i < 26; i++)
+        // {
+        //     for (int j = 0; j < 22; j++)
+        //     {
+        //         tablero[i,j].casilla=Instantiate(tablero[i,j].casilla);
+        //     }
+        // }
     }
     // Start is called before the first frame update
     void Start()
@@ -45,7 +45,7 @@ public class MainScene : MonoBehaviour
         
     }
 }
-public abstract class Casilla
+public abstract class Casilla:MonoBehaviour
 {
     public GameObject casilla;
     private Vector3 pos;
@@ -79,7 +79,7 @@ public abstract class Casilla
         // Casillas_obstaculos = new List<C_Obstaculo>();
     }
 }
-public class Normal:Casilla{public Normal(){casilla = Casillas[0];}}
+public class Normal:Casilla{public Normal(){casilla = Instantiate(Casillas[0]);}}
 public class C_Obstaculo:Casilla
 {
     public override void OnEffect()
@@ -88,7 +88,7 @@ public class C_Obstaculo:Casilla
     }
     public C_Obstaculo()
     {
-        casilla = Casillas[1];
+        casilla = Instantiate(Casillas[1]);
     }
 
     
@@ -97,7 +97,7 @@ public class C_Suerte:Casilla
 {
     public C_Suerte()
     {
-        casilla = Casillas[2];
+        casilla = Instantiate(Casillas[2]);
     }    
     public override void OnEffect()
     {
@@ -137,14 +137,14 @@ public class C_Inicial:Casilla
 {
     public C_Inicial()
     {
-        casilla = Casillas[0];
+        casilla = Instantiate(Casillas[0]);
     }
 }
 public class C_Final:Casilla
 {
      public C_Final()
     {
-        casilla = Casillas[0];
+        casilla = Instantiate(Casillas[0]);
     }
 }
 public class Tablero
