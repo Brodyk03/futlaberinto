@@ -5,9 +5,17 @@ using UnityEngine;
 
 public class MainScene : MonoBehaviour
 {
+List<Ficha[]> Fichas_de_los_Jugadores;
+    public List <GameObject> Fichas;
+    public static Ficha Selected;
+    public static MainScene Juego;
+    int Ronda;
+    byte JugadorActual;
+    public Tablero tablero;
     public List<GameObject> casillas;
     void Awake()
     {
+        Juego = this.gameObject.GetComponent<MainScene>();
         
         Casilla.Casillas = casillas;
 
@@ -24,20 +32,20 @@ public class MainScene : MonoBehaviour
         {
             for (int j = 0; j <posiciones.GetLength(1); j++) posiciones[i,j] = posinit - new Vector3((float)i,0f,(float)-j);
         }
-        Tablero tablero = new Tablero(posiciones);
+        tablero = new Tablero(posiciones);
         tablero.Generate_Board();
-        // for (int i = 0; i < 26; i++)
-        // {
-        //     for (int j = 0; j < 22; j++)
-        //     {
-        //         tablero[i,j].casilla=Instantiate(tablero[i,j].casilla);
-        //     }
-        // }
     }
     // Start is called before the first frame update
     void Start()
     {
-        
+        Ficha[]equipo1 = new Ficha [3];
+        for (int i = 0; i < equipo1.Length; i++)
+        {
+            equipo1[i]= new Ficha(Fichas [0]);
+          
+            tablero[0,i+1].Poner_Ficha(equipo1[i]);
+
+        }
     }
     // Update is called once per frame
     void Update()
@@ -56,27 +64,36 @@ public abstract class Casilla:MonoBehaviour
     //     }
     public static  List<GameObject>Casillas;
     public Ficha ficha;
-    public virtual void OnEffect(){}
+    public (int,int) Coordenada;
+    public virtual void OnEffect(){}//Efecto de cada casilla
     public static List<Normal> Casillas_normales;
     public static List<C_Obstaculo> Casillas_obstaculos;
     public static List<C_Suerte> Casilla_Suerte;
     public static List<C_Inicial> Casilla_Inicial;
     public static List<C_Final> Casilla_Final;
 
-    public Vector3 Pos { get => pos; set{ 
-        casilla.transform.position = value;
-        pos = value;
-        Debug.Log(casilla.transform.position);
-        } }
-
-    public Casilla()
+    public Vector3 Pos 
+    { 
+        get => pos; 
+        set
+        { 
+            casilla.transform.position = value;
+            pos = value;
+        } 
+    }
+    public void Poner_Ficha(Ficha vficha)
     {
-         
-        // Casilla_Inicial = new List<C_Inicial>();
-        // Casilla_Final = new List<C_Final>();
-        // Casillas_normales = new List<Normal>();
-        // Casilla_Suerte =  new List<C_Suerte>();
-        // Casillas_obstaculos = new List<C_Obstaculo>();
+        
+        if(ficha==null&&!(this is C_Obstaculo))
+        {
+            // if(vficha.Lugar!=null)vficha.Lugar.ficha=null;
+            ficha = vficha;
+            ficha.Lugar = this.GetComponent<Casilla>();
+            Debug.Log(this==null);
+            Debug.Log("Lugar de la ficha es null");
+            Debug.Log(ficha.Lugar==null);
+            ficha.Pos = Pos;
+        }
     }
 }
 public class Normal:Casilla{public Normal(){casilla = Instantiate(Casillas[0]);}}
@@ -161,7 +178,7 @@ public class Tablero
     {
         get => Table[i,j];
     }
-    public void Generate_Board()
+    public void Generate_Board()//Crea el tablero aleatorio
     {
         for (int i = 0; i < 26; i++)
         {
@@ -179,10 +196,11 @@ public class Tablero
                 }
                 else Table[i,j] = generate_casilla();
                 Table[i,j].Pos = unitypos[i,j];
+                Table[i,j].Coordenada =(i,j);
             }
         }
     }
-    Casilla generate_casilla()
+    Casilla generate_casilla()//Genera una casilla aleatoriamente
     {
         System.Random numero = new System.Random();
         int aleatorio = numero.Next(1, 6);
@@ -204,12 +222,15 @@ public class Tablero
         }
     }
 }
-public class Ficha
-{
-    // public Player jugador{get};
-    public Casilla lugar;
-    public int Velocity;
-    public int Habilidad;
-    public void Marcha_Atras(){}
+// public class Juego 
+// {
+  
 
+
+// }
+public class Player
+{
+    string name;
+    byte id;
+    Ficha[] fichas; 
 }

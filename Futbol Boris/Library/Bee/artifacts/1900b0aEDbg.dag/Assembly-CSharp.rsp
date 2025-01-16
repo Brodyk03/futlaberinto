@@ -352,7 +352,9 @@
 -r:"Library/Bee/artifacts/1900b0aEDbg.dag/UnityEngine.UI.ref.dll"
 -analyzer:"D:/Program Files/Unity 2022.3.15f1/Editor/Data/Tools/Unity.SourceGenerators/Unity.Properties.SourceGenerator.dll"
 -analyzer:"D:/Program Files/Unity 2022.3.15f1/Editor/Data/Tools/Unity.SourceGenerators/Unity.SourceGenerators.dll"
-"Assets/MainScene.cs"
+"Assets/scripts/Buttons_Movements.cs"
+"Assets/scripts/Ficha.cs"
+"Assets/scripts/MainScene.cs"
 -langversion:9.0
 
 /deterministic
