@@ -5,77 +5,87 @@ using UnityEngine;
 
 public class Ficha : MonoBehaviour
 {
-    public string Name;
+    public string Name;//externo
     private Vector3 pos;
     public Player Jugador;
     public Casilla Lugar;
     public int Velocity;
-    public int aumento_Velocidad;
-    public int Suerte;
-    public int Suerte_default;
-    public int Habilidad;
+
+    public int aumento_Velocidad;//externo
+    public int Habilidad;//externo
+    public int Enfriamiento_habilidad;//externo
+    public int duracion_efecto_habilidad;//externo
+
     public bool congelada; 
     public bool atravesado;
     public bool suerte;
-    public int Enfriamiento_habilidad;
+
+    public int enfriamiento_habilidad;
+    private int enfriamiento_congelada;
+    private int enfriamiento_atravesado;
+    private int enfriamiento_velocidad;
+    private int enfriamiento_suerte;
+    public Vector3 Pos { get => pos; set { this.gameObject.transform.position = value; pos = value; } }
     public int Enfriamiento_congelada
     {
-        get => Enfriamiento_congelada>0?Enfriamiento_congelada:0;
+        get => enfriamiento_congelada;
         set
         {
+            enfriamiento_congelada = value;
             if (value == 0) congelada = false;
             else congelada =true;
         }
     }
     public int Enfriamiento_atravesado
     {
-        get => Enfriamiento_atravesado>0?Enfriamiento_atravesado:0;
+        get => enfriamiento_atravesado;
         set
         {
+            enfriamiento_atravesado = value;
             if (value == 0) atravesado = false;
             else atravesado = true;
         }
     }
     public int Enfriamiento_velocidad
     {
-        get => Enfriamiento_velocidad>0?Enfriamiento_velocidad:0;
+        get => enfriamiento_velocidad;
         set
         {
+            enfriamiento_velocidad = value;
             if (value == 0) Velocity = 1;
             else Velocity = aumento_Velocidad;
         }
     }
-
     public int Enfriamiento_suerte
     {
-        get => Enfriamiento_suerte>0?Enfriamiento_suerte:0;
+        get => enfriamiento_suerte;
         set
         {
+            enfriamiento_suerte = value;
             if (value == 0) suerte = false;
             else suerte = true;
         }
     }
 
-
-    public Vector3 Pos { get => pos; set { this.gameObject.transform.position = value; pos = value; } }
     public void Marcha_Atras()
     {
     }
     public void Habilidad_ON()
     {
+        enfriamiento_habilidad = Enfriamiento_habilidad;
         switch (Habilidad)
         {
             case 1://Atravesar obstaculos
-            Enfriamiento_atravesado=3;
-            break;
+                Enfriamiento_atravesado = duracion_efecto_habilidad;
+                break;
             case 2://aumento de velocidad
-            Enfriamiento_velocidad = 2;
-            break;
+                Enfriamiento_velocidad = duracion_efecto_habilidad;
+                break;
             case 3://mayor suerte en las casillas trampa
-            Enfriamiento_suerte = 4;
-            break;
+                Enfriamiento_suerte = duracion_efecto_habilidad;
+                break;
             default:
-            break;
+                break;
         }
     }
     void OnMouseDown()
@@ -96,19 +106,19 @@ public class Ficha : MonoBehaviour
         }
         else if (MainScene.Juego.Estado == MainScene.EstadoDelJuego.Ventaja3 && Jugador.id != MainScene.JugadorActual)
         {
-            C_Suerte suerte = (C_Suerte)MainScene.Juego.Jugadores[MainScene.JugadorActual].Selected.Lugar;
+            C_Suerte suerte = (C_Suerte)MainScene.Jugadores[MainScene.JugadorActual].Selected.Lugar;
             suerte.Castigado = this;   
         }
     }
     public void Reducir_Enfriamiento()
     {
-        int a = Enfriamiento_habilidad;
+        int a = enfriamiento_habilidad;
         int b = Enfriamiento_congelada;
         int c = Enfriamiento_atravesado;
         int d = Enfriamiento_velocidad;
         int e = Enfriamiento_suerte;
 
-        Enfriamiento_habilidad = a>0 ?--a:0; 
+        enfriamiento_habilidad = a>0 ?--a:0; 
         Enfriamiento_congelada =b>0? --b:0;
         Enfriamiento_atravesado =c>0? --c:0;
         Enfriamiento_velocidad =d>0?--d:0;
@@ -121,7 +131,7 @@ public class Ficha : MonoBehaviour
         // Lugar = new Normal();
         // Lugar.casilla.SetActive(false);
         // Lugar.ficha = this;
-        aumento_Velocidad = 1;
+        //aumento_Velocidad = 1;
         
     }
 

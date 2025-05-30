@@ -8,22 +8,29 @@ using UnityEngine;
 
 public class MainScene : MonoBehaviour
 {
-    public Player[] Jugadores;
-    List<Ficha[]> Fichas_de_los_Jugadores;
+    //Externos
     public List<GameObject> Fichas;
+    public List<GameObject> casillas;
+    public List<GameObject> Balones;
+    public TMP_Text Ronda_ext;
+    public TMP_Text Jugador_Actual;
+    public TMP_Text Estado_Actual;
+
+    //Estaticas
+    public static Player[] Jugadores;
     private static Ficha selected0;
     private static Ficha selected1;
     public static MainScene Juego;
-    private int ronda;
     public static int JugadorActual;
+
+    //Utiles
+    List<Ficha[]> Fichas_de_los_Jugadores;
+    private int ronda;
     public Tablero tablero;
-    public List<GameObject> casillas;
-    public List<GameObject> Balones;
     List<GameObject> IBalones;
-    public TMP_Text Ronda_ext;
-    public TMP_Text Jugador_Actual;
-    public enum EstadoDelJuego{ Decision, Moverte, Menu, Habilidad, Trampa1,Trampa2,Ventaja1,Ventaja2,Ventaja3}
-    public EstadoDelJuego Estado;
+    public enum EstadoDelJuego { Decision, Moverte, Menu, Habilidad, Trampa1, Trampa2, Ventaja1, Ventaja2, Ventaja3, Info}
+    private EstadoDelJuego estado;
+
 
     public static Ficha Selected0
     {
@@ -33,8 +40,8 @@ public class MainScene : MonoBehaviour
             Juego.IBalones[0].SetActive(true);
             Juego.IBalones[0].transform.SetParent(value.gameObject.transform);
             Juego.IBalones[0].transform.localPosition = new UnityEngine.Vector3(0f, 0f, 0f);
+            Jugadores[0].Selected = value;
             selected0 = value;
-            // Hacer que funcione para dos jugadores
         }
     }
     public static Ficha Selected1
@@ -45,8 +52,8 @@ public class MainScene : MonoBehaviour
             Juego.IBalones[1].SetActive(true);
             Juego.IBalones[1].transform.SetParent(value.gameObject.transform);
             Juego.IBalones[1].transform.localPosition = new UnityEngine.Vector3(0f, 0f, 0f);
+            Jugadores[1].Selected = value;
             selected1 = value;
-            // Hacer que funcione para dos jugadores
         }
     }
 
@@ -62,6 +69,16 @@ public class MainScene : MonoBehaviour
         }
     }
 
+    public EstadoDelJuego Estado
+    {
+        get => estado;
+        set
+        {
+            estado = value;
+            Estado_Actual.text = value.ToString();
+        }
+    }
+
     public void Change_Player()
     {
         JugadorActual= JugadorActual==1?0:JugadorActual+1;
@@ -72,12 +89,11 @@ public class MainScene : MonoBehaviour
                 ficha.Reducir_Enfriamiento();
             }
         }
-
         Ronda++;
     }
+   
     void Awake()
     {
-
         Juego = this.gameObject.GetComponent<MainScene>();
 
         Casilla.Casilla_Suerte = new List<C_Suerte>();
@@ -85,7 +101,6 @@ public class MainScene : MonoBehaviour
         Casilla.Casilla_Final = new List<C_Final>();
         Casilla.Casilla_Inicial = new List<C_Inicial>();
         Casilla.Casillas_normales = new List<Normal>();
-
 
         UnityEngine.Vector3 posinit = new UnityEngine.Vector3(12.5f, 0.01f, -10.5f);
         UnityEngine.Vector3[,] posiciones = new UnityEngine.Vector3[26, 22];
@@ -104,7 +119,7 @@ public class MainScene : MonoBehaviour
         IBalones = new List<GameObject>
         {
             Instantiate(Balones[0]),
-            Instantiate(Balones[0])
+            Instantiate(Balones[1])
         };
         IBalones[0].SetActive(false);
         IBalones[1].SetActive(false);
@@ -114,12 +129,13 @@ public class MainScene : MonoBehaviour
         Jugadores[1] = new Player(Selected1);
 
         Ficha[][] equipos = new Ficha[2][];
+        int k = 0;
         for (int j = 0; j < equipos.Length; j++)//asignar fichas a los equipos 
         {
             equipos[j] = new Ficha[3];
-            for (int i = 0; i < equipos[j].Length; i++)
+            for (int i = 0; i < equipos[j].Length; i++, k++)
             {
-                equipos[j][i] = Instantiate(Fichas[0]).GetComponent<Ficha>();
+                equipos[j][i] = Instantiate(Fichas[k]).GetComponent<Ficha>();
                 if (j == 0)
                 {
                     tablero[0, i + 1].Poner_Ficha(equipos[j][i]);
@@ -180,98 +196,26 @@ public abstract class Casilla : MonoBehaviour
 
         if (ficha == null && !(this is C_Obstaculo))
         {
-            if (vficha.Lugar!=null)
+            if (vficha.Lugar != null)
             {
                 vficha.Lugar.ficha = null;
             }
             ficha = vficha;
             ficha.Lugar = this;
             ficha.Pos = Pos;
+            if (this is C_Final)
+            {
+                ficha.Enfriamiento_congelada = int.MaxValue;
+                ficha.Enfriamiento_habilidad = int.MaxValue;
+                ficha.Jugador.fichas_final += 1;
+            }
         }
     }
 }
-// public class Normal : Casilla 
-// { 
-//     public Normal() 
-//     { 
-//         casilla = Instantiate(Casillas[0]); 
-//         name = "Casilla Normal";
-//     } 
-// }
-// public class C_Obstaculo : Casilla
-// {
-//     public override void OnEffect()
-//     {
-//         ficha.Marcha_Atras();
-//     }
-//     public C_Obstaculo()
-//     {
-//         casilla = Instantiate(Casillas[1]);
-//         name = "Casilla Obstaculo";
-//     }
 
-
-// }
-// public class C_Suerte : Casilla
-// {
-    // public C_Suerte()
-    // {
-    //     casilla = Instantiate(Casillas[2]);
-    //     name = "Casilla Sueerte";
-    // }
-    // public override void OnEffect()
-    // {
-    //     int numero;
-    //     System.Random effect = new System.Random();
-    //     numero = effect.Next(1, 2);
-    //     switch (numero)
-    //     {
-    //         case 1:
-    //             Ventaja();
-    //             break;
-    //         case 2:
-    //             Trampa();
-    //             break;
-    //         default:
-    //             break;
-    //     }
-    // }
-    // public void Trampa()
-    // {
-    //     // switch (switch_on)
-    //     // {
-    //     //     default:
-    //     // }
-    //     throw new NotImplementedException();
-    // }
-    // public void Ventaja()
-    // {
-    //     // switch (switch_on)
-    //     // {
-    //     //     default:
-    //     // }
-    //     throw new NotImplementedException();
-    // }
-//}
-// public class C_Inicial : Casilla
-// {
-//     public C_Inicial()
-//     {
-//         casilla = Instantiate(Casillas[0]);
-//         name = "Casilla Inicial";
-//     }
-// }
-// public class C_Final : Casilla
-// {
-//     public C_Final()
-//     {
-//         casilla = Instantiate(Casillas[0]);
-//         name = "Casilla Final";
-//     }
-// }
-public class Tablero:ScriptableObject
+public class Tablero : ScriptableObject
 {
-    GameObject campo;
+    // GameObject campo;
     UnityEngine.Vector3[,] unitypos;
     Casilla[,] Table;
     public void Constructor(UnityEngine.Vector3[,] x)
@@ -300,11 +244,12 @@ public class Tablero:ScriptableObject
                     Casilla.Casilla_Final.Add((C_Final)Table[i, j]);
                 }
                 else Table[i, j] = generate_casilla();
-                Table [i,j].casilla = Table[i,j].gameObject;
+                Table[i, j].casilla = Table[i, j].gameObject;
                 Table[i, j].Pos = unitypos[i, j];
                 Table[i, j].Coordenada = (i, j);
             }
         }
+        Arreglar_Tablero();
     }
     Casilla generate_casilla()//Genera una casilla aleatoriamente
     {
@@ -327,21 +272,123 @@ public class Tablero:ScriptableObject
                 return x;
         }
     }
+    public (bool,int) Casilla_encerrada(Casilla casilla)
+    {
+        (int, int) Coordenada = casilla.Coordenada;
+        bool a; bool b; bool c; bool d;
+        a = this[Coordenada.Item1 + 1, Coordenada.Item2] is C_Obstaculo;
+        b = this[Coordenada.Item1 - 1, Coordenada.Item2] is C_Obstaculo;
+        int numero=0;
+        if (Coordenada.Item2 == 0)
+        {
+            c = true;
+            d = this[Coordenada.Item1, Coordenada.Item2 + 1] is C_Obstaculo;
+            numero = 1;
+        }
+        else if (Coordenada.Item2 == 21)
+        {
+            c = this[Coordenada.Item1, Coordenada.Item2 - 1] is C_Obstaculo;
+            d = true;
+            numero = 2;
+        }
+        else
+        {
+            c = this[Coordenada.Item1, Coordenada.Item2 + 1] is C_Obstaculo;
+            d = this[Coordenada.Item1, Coordenada.Item2 - 1] is C_Obstaculo;
+        }
+        return (a & b & c & d, numero);
+    }
+     void Arreglar_Tablero()
+    {
+        for (int i = 1; i < 25 ; i++)
+        {
+            for (int j = 0; j < 22; j++)
+            {
+                (bool, int) Encerrada = this.Casilla_encerrada(this[i, j]);
+                if (this[i, j] is Normal && Encerrada.Item1)
+                {
+                    int random;
+                    System.Random numero = new System.Random();
+                    switch (Encerrada.Item2)
+                    {
+                        case 0:
+                            random = numero.Next(1, 4);
+                            break;
+                        case 1:
+                            random = numero.Next(1, 3);
+                            break;
+                        default:
+                            random = numero.Next(1, 3);
+                            random = random == 3 ? 4 : random;
+                            break;
+                    }
+                    Casilla x;
+                    switch (random)
+                    {
+                        case 1:
+                            x = this[i+1, j];
+                            Destroy(x.gameObject);
+                            Table[i+1, j] = Instantiate(MainScene.Juego.casillas[0]).GetComponent<Normal>();
+                            x = Table[i+1, j];
+                            Casilla.Casillas_normales.Add((Normal)x);
+                            Table[i+1, j].casilla = Table[i+1, j].gameObject;
+                            Table[i+1, j].Pos = unitypos[i+1, j];
+                            Table[i+1, j].Coordenada = (i+1, j);
+                            break;
+                        case 2:
+                            x = this[i-1, j];
+                            Destroy(x.gameObject);
+                            Table[i-1, j] = Instantiate(MainScene.Juego.casillas[0]).GetComponent<Normal>();
+                            x = Table[i-1, j];
+                            Casilla.Casillas_normales.Add((Normal)x);
+                            Table[i-1, j].casilla = Table[i-1, j].gameObject;
+                            Table[i-1, j].Pos = unitypos[i-1, j];
+                            Table[i-1, j].Coordenada = (i-1, j);
+                            break;
+                        case 3:
+                            x = this[i, j+1];
+                            Destroy(x.gameObject);
+                            Table[i, j+1] = Instantiate(MainScene.Juego.casillas[0]).GetComponent<Normal>();
+                            x = Table[i, j+1];
+                            Casilla.Casillas_normales.Add((Normal)x);
+                            Table[i, j+1].casilla = Table[i, j+1].gameObject;
+                            Table[i, j+1].Pos = unitypos[i, j+1];
+                            Table[i, j+1].Coordenada = (i, j+1);
+                            break;
+                        default:
+                            x = this[i, j-1];
+                            Destroy(x.gameObject);
+                            Table[i, j-1] = Instantiate(MainScene.Juego.casillas[0]).GetComponent<Normal>();
+                            x = Table[i, j-1];
+                            Casilla.Casillas_normales.Add((Normal)x);
+                            Table[i, j-1].casilla = Table[i, j-1].gameObject;
+                            Table[i, j-1].Pos = unitypos[i, j-1];
+                            Table[i, j-1].Coordenada = (i, j-1);
+                            break;
+                    }
+
+                }
+            }
+        }
+    }
 }
-// public class Juego 
-// {
 
-
-
-// }
 public class Player
 {
     public string name;
     public byte id;
     public Ficha[] fichas;
     public Ficha Selected;
+    public int fichas_final;
     public Player(Ficha selected)
     {
         Selected = selected;
+        fichas_final = 0;
+    }
+
+    public bool Hay_Ganador()
+    {
+        if (fichas_final == 3) return true;
+        else return false;
     }
 }

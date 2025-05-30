@@ -1,8 +1,10 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+// using System.Diagnostics;
 using UnityEditor.Scripting;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Buttons_Movements : MonoBehaviour
 {
@@ -10,10 +12,11 @@ public class Buttons_Movements : MonoBehaviour
     public GameObject Movimiento;
     public GameObject Menu;
     public GameObject Ok;
+    public static Button OK;
     public static Buttons_Movements Buttons;
     public void Up()//Mover hacia adelante
     {
-
+        Debug.Log(MainScene.Juego.Estado);
        if (MainScene.Juego.Estado==MainScene.EstadoDelJuego.Moverte)
        {
                 Ficha ficha;
@@ -51,7 +54,10 @@ public class Buttons_Movements : MonoBehaviour
                     C_Suerte CasillaS = (C_Suerte)Destino;
                     CasillaS.OnEffect(ficha.suerte);
                 }
-                MainScene.Juego.Estado= MainScene.EstadoDelJuego.Menu;
+                else
+                {
+                    MainScene.Juego.Estado = MainScene.EstadoDelJuego.Menu;
+                }
                 Movimiento.SetActive(false);
                 Ok.SetActive(true);
             }
@@ -94,7 +100,15 @@ public class Buttons_Movements : MonoBehaviour
                     Destino = x;
                 }
                 Destino.Poner_Ficha(ficha);
-                MainScene.Juego.Estado= MainScene.EstadoDelJuego.Menu;
+                if (Destino is C_Suerte)
+                {
+                    C_Suerte CasillaS = (C_Suerte)Destino;
+                    CasillaS.OnEffect(ficha.suerte);
+                }
+                else
+                {
+                    MainScene.Juego.Estado = MainScene.EstadoDelJuego.Menu;
+                }
                 Movimiento.SetActive(false);
                 Ok.SetActive(true);
             }
@@ -137,7 +151,15 @@ public class Buttons_Movements : MonoBehaviour
                     Destino = x;
                 }
                 Destino.Poner_Ficha(ficha);
-                MainScene.Juego.Estado= MainScene.EstadoDelJuego.Menu;
+                if (Destino is C_Suerte)
+                {
+                    C_Suerte CasillaS = (C_Suerte)Destino;
+                    CasillaS.OnEffect(ficha.suerte);
+                }
+                else
+                {
+                    MainScene.Juego.Estado = MainScene.EstadoDelJuego.Menu;
+                }
                 Movimiento.SetActive(false);
                 Ok.SetActive(true);
             }
@@ -181,7 +203,15 @@ public class Buttons_Movements : MonoBehaviour
                 }
                 
                 Destino.Poner_Ficha(ficha);
-                MainScene.Juego.Estado= MainScene.EstadoDelJuego.Menu;
+                if (Destino is C_Suerte)
+                {
+                    C_Suerte CasillaS = (C_Suerte)Destino;
+                    CasillaS.OnEffect(ficha.suerte);
+                }
+                else
+                {
+                    MainScene.Juego.Estado = MainScene.EstadoDelJuego.Menu;
+                }
                 Movimiento.SetActive(false);
                 Ok.SetActive(true);
             }
@@ -207,17 +237,40 @@ public class Buttons_Movements : MonoBehaviour
     }
     public void Terminar()
     {
-        MainScene.Juego.Change_Player();
-        Ok.SetActive(false);
-        Menu.SetActive(true);
-        if (MainScene.Juego.Jugadores[MainScene.JugadorActual].Selected.Enfriamiento_habilidad != 0)Habilidads.SetActive(false);
-        else Habilidads.SetActive(true);
+        if (MainScene.Juego.Estado == MainScene.EstadoDelJuego.Menu)
+        {
+            bool FinDelJuego = MainScene.Jugadores[MainScene.JugadorActual].Hay_Ganador();
+            Ok.SetActive(false);
+            if (!FinDelJuego)
+            {
+                MainScene.Juego.Change_Player();
+                Menu.SetActive(true);
+            }
+            else
+            {
+                Debug.Log("El Ganador es el Jugador" + MainScene.JugadorActual);
+            }
+        }
+        else
+        {
+            MainScene.Juego.Estado = MainScene.EstadoDelJuego.Menu;
+            OK.onClick.RemoveAllListeners();
+            //OK.onClick.AddListener(Terminar);
+        }
+        
     }
     public void Moverse()
     {
-        MainScene.Juego.Estado= MainScene.EstadoDelJuego.Moverte;
-        Menu.SetActive(false);
-        Movimiento.SetActive(true);
+        if (!MainScene.Jugadores[MainScene.JugadorActual].Selected.congelada)
+        {
+            MainScene.Juego.Estado = MainScene.EstadoDelJuego.Moverte;
+            Menu.SetActive(false);
+            Movimiento.SetActive(true);
+        }
+        else
+        {
+            Debug.Log("Esta ficha esta congelada");
+        }
     }
     public void Decision()
     {
@@ -226,19 +279,24 @@ public class Buttons_Movements : MonoBehaviour
     }
     public void Habilidad()
     {
-        Ficha ficha;
-        if (MainScene.JugadorActual == 0) ficha = MainScene.Selected0;
-        else ficha = MainScene.Selected1;
-        ficha.Habilidad_ON();
+        Ficha ficha = MainScene.Jugadores[MainScene.JugadorActual].Selected;
+        // if (MainScene.JugadorActual == 0) ficha = MainScene.Selected0;
+        // else ficha = MainScene.Selected1;
+        if (ficha.enfriamiento_habilidad == 0) ficha.Habilidad_ON();
+        else
+        {
+            Debug.Log("Todavia no puedes usar la habilidad de esta ficha");
+        }
     }
     void Awake()
     {
         Buttons = this;
         Movimiento.SetActive(false);
         Ok.SetActive(false);
+        OK = Ok.GetComponent<Button>();
         Menu.SetActive(true);
-        if (MainScene.Juego.Jugadores[MainScene.JugadorActual].Selected.Enfriamiento_habilidad != 0)Habilidads.SetActive(false);
-        else Habilidads.SetActive(true);
+        // if (MainScene.Juego.Jugadores[MainScene.JugadorActual].Selected.Enfriamiento_habilidad != 0)Habilidads.SetActive(false);
+        // else Habilidads.SetActive(true);
         
     }
 }

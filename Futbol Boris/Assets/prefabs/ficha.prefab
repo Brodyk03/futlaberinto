@@ -120,7 +120,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1c26eecd0ce7c7442a32de2582d8a690, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  lugar: {fileID: 0}
+  Name: 
+  Lugar: {fileID: 0}
   Velocity: 0
-  MaxVelocity: 0
+  aumento_Velocidad: 0
   Habilidad: 0
+  Enfriamiento_habilidad: 0
+  duracion_efecto_habilidad: 0
+  congelada: 0
+  atravesado: 0
+  suerte: 0
+  enfriamiento_habilidad: 0
