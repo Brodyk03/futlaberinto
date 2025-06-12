@@ -259,11 +259,11 @@ public class Tablero : ScriptableObject
         switch (aleatorio)
         {
             case 1:
-                x = Instantiate(MainScene.Juego.casillas[2]).GetComponent<C_Obstaculo>();
+                x = Instantiate(MainScene.Juego.casillas[1]).GetComponent<C_Obstaculo>();
                 Casilla.Casillas_obstaculos.Add((C_Obstaculo)x);
                 return x;
             case 2:
-                x = Instantiate(MainScene.Juego.casillas[1]).GetComponent<C_Suerte>();
+                x = Instantiate(MainScene.Juego.casillas[2]).GetComponent<C_Suerte>();
                 Casilla.Casilla_Suerte.Add((C_Suerte)x);
                 return x;
             default:
